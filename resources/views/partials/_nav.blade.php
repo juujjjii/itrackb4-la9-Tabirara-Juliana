@@ -1,5 +1,14 @@
 <nav>
-    <a href="{{ route('books.index') }}" class="btn btn-outline-light btn-sm">All Books</a>
-    <a href="{{ route('books.filter') }}" class="btn btn-outline-light btn-sm">Filter Books</a>
-    <a href="{{ route('books.featured') }}" class="btn btn-outline-light btn-sm">Featured Book</a>
+    <a href="{{ route('subjects.index') }}"
+       class="btn btn-sm {{ request()->is('subjects*') ? 'btn-light' : 'btn-outline-light' }}">
+        All Subjects
+    </a>
+    <a href="{{ route('subjects.filter') }}"
+       class="btn btn-outline-light btn-sm">
+        Filter Subjects
+    </a>
+    <a href="{{ route('subjects.featured') }}"
+       class="btn btn-outline-light btn-sm">
+        Featured Subject
+    </a>
 </nav>

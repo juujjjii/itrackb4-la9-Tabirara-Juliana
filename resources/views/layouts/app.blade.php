@@ -20,7 +20,7 @@
     </main>
 
     <footer class="container text-center text-muted mt-5 mb-3">
-        <p>Robin Quijano</p>
+        <p>Juliana Tabirara</p>
     </footer>
 
 </body>
