@@ -3,7 +3,10 @@
 @section('title', 'My Subjects List')
 
 @section('content')
-    <h1>My Subjects List</h1>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="mb-0">My Subjects List</h1>
+        <a href="{{ route('subjects.create') }}" class="btn btn-success">+ Add Subject</a>
+    </div>
 
     <div class="mb-3">
         <strong>Filter by code:</strong>

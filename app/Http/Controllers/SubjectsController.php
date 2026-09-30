@@ -8,14 +8,20 @@ class SubjectsController extends Controller
 {
     private function getSubjects()
     {
-        return [
-            1 => ['id' => 1, 'code' => 'CAP102',   'title' => 'Capstone Project 2',    'units' => 3],
-            2 => ['id' => 2, 'code' => 'ITP1333',  'title' => 'Information Assurance', 'units' => 3],
-            3 => ['id' => 3, 'code' => 'ITP1441',  'title' => 'System Administration', 'units' => 3],
-            4 => ['id' => 4, 'code' => 'ITRACKB4', 'title' => 'Web Programming 2',     'units' => 3],
-            5 => ['id' => 5, 'code' => 'ITP831',   'title' => 'Networking 2',          'units' => 3],
-            6 => ['id' => 6, 'code' => 'ITP123',   'title' => 'Data Analytics',        'units' => 3],
-        ];
+        $path = storage_path('app/subjects.json');
+        $data = json_decode(file_get_contents($path), true);
+
+        $subjects = [];
+        foreach ($data as $s) {
+            $subjects[$s['id']] = $s;
+        }
+        return $subjects;
+    }
+
+    private function saveSubjects(array $subjects)
+    {
+        $path = storage_path('app/subjects.json');
+        file_put_contents($path, json_encode(array_values($subjects), JSON_PRETTY_PRINT));
     }
 
     public function index(Request $request)
@@ -47,24 +53,46 @@ class SubjectsController extends Controller
 
     public function create()
     {
-        //
+        return view('subjects.create');
     }
 
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'code'  => 'required|string|max:20',
+            'title' => 'required|string|max:100',
+            'units' => 'required|in:1,2,3',
+        ]);
+
+        $subjects = $this->getSubjects();
+
+        $newId = empty($subjects) ? 1 : max(array_keys($subjects)) + 1;
+
+        $subjects[$newId] = [
+            'id'    => $newId,
+            'code'  => $validated['code'],
+            'title' => $validated['title'],
+            'units' => $validated['units'],
+        ];
+
+        $this->saveSubjects($subjects);
+
+        return redirect()
+            ->route('subjects.index')
+            ->with('success', 'Subject added successfully.');
     }
 
-    public function show($id)
+    public function show(string $id)
     {
         $subjects = $this->getSubjects();
         if (!isset($subjects[$id])) {
             abort(404);
         }
-        return view('subjects.show', ['subject' => $subjects[$id]]);
+        $subject = $subjects[$id];
+        return view('subjects.show', ['subject' => $subject]);
     }
 
-    public function edit($id)
+    public function edit(string $id)
     {
         //
     }
@@ -74,7 +102,7 @@ class SubjectsController extends Controller
         //
     }
 
-    public function destroy($id)
+    public function destroy(string $id)
     {
         //
     }
@@ -84,5 +112,4 @@ class SubjectsController extends Controller
         $subjects = $this->getSubjects();
         return view('subjects.featured', ['featured' => $subjects[4]]);
     }
-
 }
