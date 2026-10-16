@@ -1,13 +1,10 @@
-Activity 7
 
-# Q1.Your form sends data with POST rather than GET. Explain what would go wrong if it used GET instead. Your answer should say something about what a browser does when a page is refreshed.
+#Question
+F1- Which column did you make nullable, and why that one and not another?
+    I made prerequisite the nullable column. Some subjects genuinely have no prerequisite, so an empty value is a normal answer there, while code, title, units and is_active must always have a value and stay required.
 
- With GET, the form data would go into the URL as a query string. Refreshing a page just re-requests the current URL, so every refresh would resend the same "add subject" request and create a duplicate — with no warning, since GET is treated as safe to repeat.
+F2- Which step failed first for you, and what did the error say?
+    The first thing to fail was my seeder, which I ran before adding $fillable to the Subject model. It threw a MassAssignmentException saying to add [code] to the fillable property, because Eloquent refuses to fill any column that isn't listed. Adding the $fillable list fixed it.
 
-# Q2. When validation fails, your controller does not run the code that saves the record — and you did not write an if statement to stop it. Explain what actually stops it, and where the visitor ends up.
-
-$request->validate([...]) throws an exception the instant a rule fails, and Laravel's handler catches it automatically — that's what stops execution, not an if I wrote. It then redirects back to the form with the errors and old input flashed into the session.
-
-# Q3.Your success message is displayed from the layout, which renders on every page. Explain why it does not appear on every page.
-
- The layout's @if (session('success')) check does run on every page — but flashed session data only survives one request after it's set. So the check is always there, it just finds nothing after that one request, which is why the message shows once and disappears on its own.
+F3- You changed no Blade file in Part D, yet your pages still work. Why not?
+    My Blade files only read values by key from the variables the controller passes in, such as $subject['title']. Eloquent models can be read the same way as arrays, and I kept the same variable names, so the views couldn't tell that the data now comes from a table instead of a JSON file.
