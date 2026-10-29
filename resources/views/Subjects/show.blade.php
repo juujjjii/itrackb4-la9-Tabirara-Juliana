@@ -8,6 +8,7 @@
         <li class="list-group-item"><strong>ID:</strong> {{ $subject['id'] }}</li>
         <li class="list-group-item"><strong>Code:</strong> {{ $subject['code'] }}</li>
         <li class="list-group-item"><strong>Units:</strong> {{ $subject['units'] }}</li>
+        <li class="list-group-item"><strong>Prerequisite:</strong> {{ $subject->prerequisite->name }}</li>
     </ul>
 
     <a href="{{ route('subjects.index') }}" class="btn btn-secondary mt-3">← Back to Subject List</a>

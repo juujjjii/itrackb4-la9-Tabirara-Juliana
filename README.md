@@ -1,10 +1,11 @@
+## G1. Which column did you turn into a table, and why?
 
-#Question
-F1- Which column did you make nullable, and why that one and not another?
-    I made prerequisite the nullable column. Some subjects genuinely have no prerequisite, so an empty value is a normal answer there, while code, title, units and is_active must always have a value and stay required.
+I turned the `prerequisite` column in my `subjects` table into a separate `prerequisites` table. This avoids repeating prerequisite names in every subject record and lets the subjects table reference each prerequisite using `prerequisite_id`.
 
-F2- Which step failed first for you, and what did the error say?
-    The first thing to fail was my seeder, which I ran before adding $fillable to the Subject model. It threw a MassAssignmentException saying to add [code] to the fillable property, because Eloquent refuses to fill any column that isn't listed. Adding the $fillable list fixed it.
+## G2. What number did Screenshot 6 show, and why exactly that number?
 
-F3- You changed no Blade file in Part D, yet your pages still work. Why not?
-    My Blade files only read values by key from the variables the controller passes in, such as $subject['title']. Eloquent models can be read the same way as arrays, and I kept the same variable names, so the views couldn't tell that the data now comes from a table instead of a JSON file.
+Screenshot 6 showed 8 queries. The count included the subjects query, queries used to load each subject's prerequisite relationship, and an additional query from `Prerequisite::all()` used by the prerequisite filter in the Blade view.
+
+## G3. Your belongsTo method is named in the singular. What would break if you made it plural?
+
+My `Subject` model uses the singular `prerequisite()` method because each subject belongs to one prerequisite. If I renamed it to `prerequisites()` without updating the code that calls the relationship, Laravel would not find the expected `prerequisite` relationship, and calls such as `with('prerequisite')` would fail.

@@ -21,7 +21,7 @@
                 {{ session('success') }}
             </div>
         @endif
-
+            
         @yield('content')
     </main>
 

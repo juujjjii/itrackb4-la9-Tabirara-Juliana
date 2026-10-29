@@ -15,5 +15,5 @@ Route::get('/subjects/filter/{units?}', function ($units = null) {
     return redirect()->route('subjects.index', $units !== null ? ['units' => $units] : []);
 })->name('subjects.filter');
 
-Route::resource('subjects', SubjectsController::class)
-    ->only(['index', 'show', 'create', 'store']);
+Route::resource('subjects', SubjectsController::class);
+   // (['index', 'show', 'create', 'store']);

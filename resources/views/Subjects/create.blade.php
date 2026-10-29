@@ -39,7 +39,37 @@
             @enderror
         </div>
 
+        <div class="mb-3">
+            <label for="prerequisite_id" class="form-label">Prerequisite</label>
+            <select name="prerequisite_id" id="prerequisite_id"
+                    class="form-select @error('prerequisite_id') is-invalid @enderror">
+                <option value="" disabled {{ old('prerequisite_id') ? '' : 'selected' }}>Choose a prerequisite</option>
+                @foreach ($prerequisites as $prerequisite)
+                    <option value="{{ $prerequisite->id }}"
+                        @selected(old('prerequisite_id') == $prerequisite->id)
+                    >{{ $prerequisite->name }}</option>
+                @endforeach
+            </select>
+            @error('prerequisite_id')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+
         <button type="submit" class="btn btn-primary">Save Subject</button>
         <a href="{{ route('subjects.index') }}" class="btn btn-secondary">Cancel</a>
     </form>
 @endsection
+<label for="prerequisite_id">Prerequisite</label>
+
+<select name="prerequisite_id" id="prerequisite_id">
+    <option value="">Select prerequisite</option>
+
+    @foreach ($prerequisites as $prerequisite)
+        <option
+            value="{{ $prerequisite->id }}"
+            @selected(old('prerequisite_id') == $prerequisite->id)
+        >
+            {{ $prerequisite->name }}
+        </option>
+    @endforeach
+</select>

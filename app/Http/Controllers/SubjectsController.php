@@ -2,114 +2,104 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Prerequisite;
+use App\Models\Subject;
 use Illuminate\Http\Request;
 
 class SubjectsController extends Controller
 {
-    private function getSubjects()
-    {
-        $path = storage_path('app/subjects.json');
-        $data = json_decode(file_get_contents($path), true);
-
-        $subjects = [];
-        foreach ($data as $s) {
-            $subjects[$s['id']] = $s;
-        }
-        return $subjects;
-    }
-
-    private function saveSubjects(array $subjects)
-    {
-        $path = storage_path('app/subjects.json');
-        file_put_contents($path, json_encode(array_values($subjects), JSON_PRETTY_PRINT));
-    }
-
     public function index(Request $request)
     {
-        $subjects = $this->getSubjects();
+        $code           = $request->query('code', '');
+        $units          = $request->query('units', '');
+        $prerequisiteId = $request->query('prerequisite_id', '');
 
-        $code  = $request->query('code', '');
-        $units = $request->query('units', '');
+        $allSubjects   = Subject::all()->toArray();
+        $prerequisites = Prerequisite::all();
+
+        $query = Subject::with('prerequisite');
 
         if ($code !== '') {
-            $subjects = array_filter($subjects, function ($s) use ($code) {
-                return $s['code'] === $code;
-            });
+            $query = $query->where('code', $code);
         }
 
         if ($units !== '') {
-            $subjects = array_filter($subjects, function ($s) use ($units) {
-                return $s['units'] == $units;
-            });
+            $query = $query->where('units', $units);
         }
 
-        return view('subjects.index', [
-            'subjects'    => $subjects,
-            'allSubjects' => $this->getSubjects(),
-            'code'        => $code,
-            'units'       => $units,
-        ]);
+        if ($prerequisiteId !== '') {
+            $query = $query->where('prerequisite_id', $prerequisiteId);
+        }
+
+        $subjects = $query->get();
+
+        return view('subjects.index', compact(
+            'subjects', 'allSubjects', 'prerequisites',
+            'code', 'units', 'prerequisiteId'
+        ));
     }
 
     public function create()
     {
-        return view('subjects.create');
+        $prerequisites = Prerequisite::all();
+        return view('subjects.create', compact('prerequisites'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'code'  => 'required|string|max:20',
-            'title' => 'required|string|max:100',
-            'units' => 'required|in:1,2,3',
+            'code'            => 'required|string|max:20',
+            'title'           => 'required|string|max:100',
+            'units'           => 'required|in:1,2,3',
+            'prerequisite_id' => 'required|exists:prerequisites,id',
         ]);
 
-        $subjects = $this->getSubjects();
-
-        $newId = empty($subjects) ? 1 : max(array_keys($subjects)) + 1;
-
-        $subjects[$newId] = [
-            'id'    => $newId,
-            'code'  => $validated['code'],
-            'title' => $validated['title'],
-            'units' => $validated['units'],
-        ];
-
-        $this->saveSubjects($subjects);
+        Subject::create($validated);
 
         return redirect()
             ->route('subjects.index')
             ->with('success', 'Subject added successfully.');
     }
 
-    public function show(string $id)
+    public function show(Subject $subject)
     {
-        $subjects = $this->getSubjects();
-        if (!isset($subjects[$id])) {
-            abort(404);
-        }
-        $subject = $subjects[$id];
-        return view('subjects.show', ['subject' => $subject]);
+        return view('subjects.show', compact('subject'));
     }
 
-    public function edit(string $id)
+    public function edit(Subject $subject)
     {
-        //
+        $prerequisites = Prerequisite::all();
+        return view('subjects.edit', compact('subject', 'prerequisites'));
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, Subject $subject)
     {
-        //
+        $validated = $request->validate([
+            'code'            => 'required|string|max:20',
+            'title'           => 'required|string|max:100',
+            'units'           => 'required|in:1,2,3',
+            'prerequisite_id' => 'required|exists:prerequisites,id',
+        ]);
+
+        $subject->update($validated);
+
+        return redirect()
+            ->route('subjects.index')
+            ->with('success', 'Subject updated successfully.');
     }
 
-    public function destroy(string $id)
+    public function destroy(Subject $subject)
     {
-        //
+        $subject->delete();
+
+        return redirect()
+            ->route('subjects.index')
+            ->with('success', 'Subject deleted successfully.');
     }
 
     public function featured()
     {
-        $subjects = $this->getSubjects();
-        return view('subjects.featured', ['featured' => $subjects[4]]);
+        $featured = Subject::where('code', 'ITRACKB4')->firstOrFail();
+        return view('subjects.featured', compact('featured'));
     }
 }
